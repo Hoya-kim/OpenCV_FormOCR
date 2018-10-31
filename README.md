@@ -6,9 +6,11 @@
 
 **Image to document file**
 - 이미지로 되어있는 양식 (하드카피된 양식의 스캔본이라 가정)을 문서파일(ex. xlsx)로 생성
+
  - 스캔또는 촬영 된 Form 이미지를 이용
     Form 의 재사용성을 높이고, 유사한 Form의 재생산을 막아 효율적인 사무업무 처리를 위한 프로그램
-    ![default](https://user-images.githubusercontent.com/41777022/47786239-80081100-dd4e-11e8-8421-8227930132c2.jpeg)
+
+    ![opening](./images/opening.jpeg)
 
 ---
 
@@ -16,13 +18,14 @@
 
  기본적으로 OpenCV 라이브러리와 OCR을 위한 Tesseract 라이브러리가 필요합니다.
 
-
 **라이브러리**
+
  - openCV (https://opencv.org/releases.html)
 
  - Tesseract Open Source OCR Engine (https://github.com/tesseract-ocr/tesseract)
 
 **개발환경 및 툴**
+
  - Python 3.6
  - MacOS tesseract 4.0 beta
  - IDE : JetBrains PyCharm
@@ -59,7 +62,7 @@
 2. OCR cells
 3. Export to document
 
-![overview](/Users/kimjungho/Downloads/overview.png)
+![overview](./images/overview.png)
 
 ---
 
@@ -98,7 +101,7 @@ class Cell(object):
 
 ### Class diagram
 
-![ClassDiagram](/Users/kimjungho/Downloads/ClassDiagram.png)
+![ClassDiagram](./images/ClassDiagram.png)
 
 ---
 
@@ -139,17 +142,17 @@ def merge_cell():
 ```
 
 ### - Example
-![무제.001.jpeg](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/무제/무제.001.jpeg)
+![samples](./images/samples.jpeg)
 
 ## Attempt! Form 추출
 **< Original Image>**
-![Original](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/Original.png)
+![Original](./images/Original.png)
 
 ---
 
 ### Trial 1
  `cv2.HoughLinesP()`메소드를 이용해보자! (edge추출의 Canny알고리즘 이용)
-![hough](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/hough.png)
+![hough](./images/hough.png)
 **Problem!**
 글자사이 생기는 line과 표를 구분할 수 있는 적합한 파라미터를 조정할 수 없음!
 
@@ -157,7 +160,7 @@ def merge_cell():
 
 ### Trial 2
  `cv2.findContours()`메소드를 이용해보자! (`cv2.threshold()`이용)
-![그냥Contour2](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/그냥Contour2.png)
+![contour](./images/contour.png)
 **Problem!**
 웹 상에 흔히 돌아다니는 오픈소스를 사용하면 min_width, ,min_height를 조정하여 크기에 따른 contour추출밖에 할 수 없음!
 **제목과 같은 큰 Contours**와 **표를 이루는 작은 셀의 Contours**와의 구분점을 일일이 찾아줄 수 밖에 없음
@@ -178,7 +181,6 @@ _, contours, hierarchy = cv2.findContours(thr, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_
 따라서
  >child가 없는 contour == 최내곽
  >
- >
  >parent가 최외곽 or 최외곽-1인 contour
 
  이 점을 이용하여 표를 추출하자!
@@ -188,7 +190,7 @@ if (width > min_width and height > min_height) and ((hierarchy[0, i, 2] != -1 or
 ```
 ---
 
-![그냥Contour](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/그냥Contour.png)
+![contour_improved](./images/contour_improved.png)
 **Problem!**
 그럼에도 **불분명한 경계선** 때문에 표 전부를 완벽하게 추출할 수 없음
 **Solution!**
@@ -197,7 +199,7 @@ if (width > min_width and height > min_height) and ((hierarchy[0, i, 2] != -1 or
 
 ## Solution!
 ### def boxing_ambiguous()
-![무제.001](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/무제/무제.001.jpeg)
+![edge_strenthen](./images/edge_strenthen.jpeg)
 
 <span style="color:#0052cc">파란색</span>으로 표시된 것처럼 경계면이 명확한 선으로 표현되어 있지 않거나, 명암이 불분명한 경계선에 확실한 구분점을 주어 contour인식률을 높인다.
 
@@ -206,7 +208,7 @@ if (width > min_width and height > min_height) and ((hierarchy[0, i, 2] != -1 or
 ### def detect_contours()
 
 위 과정 `def boxing_ambiguous()`를 통해 경계선을 명확하게 만들었으므로 좀 더 수월하게 **목표하는 contours**를 추출할 수 있다.
-![detect_contour](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/detect_contour.png)
+![detect_contour](./images/detect_contour.png)
 
 ---
 이렇게 추출한 contours 사각형을 
@@ -214,20 +216,20 @@ if (width > min_width and height > min_height) and ((hierarchy[0, i, 2] != -1 or
 self.line_image = self.img * 0
 ```
 다음과 같은 Original size의 까만 이미지에 흰색선으로 그려 다음과 같이 `Line_image`를 만든다.
-![Line_image](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/Line_image.png)
+![Line_image](./images/Line_image.png)
 
 ## Attempt! Line_image와 Erased_Line으로의 분리
 위에서 추출한 `Line_image`를 원본 이미지에 **덮어씌워** 라인을 지운다.
 **Problem!**
 추출한 contours 사각형은 
-![Line_image 복사본](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/Line_image 복사본.png)
+![Line_image_partial](./images/Line_image_partial.png)
 
 다음과 같이 contour사이에 **빈공간**이 존재!
 
 ### Trial
 애초에 흰색 Contours 사각형을 그릴 때, 두께를 두껍게 해보자!
 
-![erase_lines](/Users/kimjungho/Downloads/erase_lines.png)
+![erase_lines_partial](./images/erase_lines_partial.png)
 
 두께를 두껍게 하면 검출된 contours를 기준으로 두께를 늘리기 때문에 Text가 지워질 수 있고,
 두께를 늘린 사각형은 기본적으로 모서리가 둥그스름하게 표현되므로 짜투리가 남게 된다.
@@ -235,15 +237,16 @@ self.line_image = self.img * 0
 ## Solution!
 ### def morph_closing()
 `cv2.morphologyEx()`의 `cv2.MORPH_CLOSE`를 이용하여 해결
-![line&closing](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/line&closing.jpeg)
+![line&closing](./images/line&closing.jpeg)
 
 ---
 Closing 된 `Line_image`를 원본`Original_image`에 덮어씌워
 `line_image(라인만 있는 이미지)`와 `Erased_line(라인이 지워진 이미지)`로 나눈다.
+
 ```python
 self.erased_line = cv2.addWeighted(self.Origin_image, 1, self.line_image, 1, 0)
 ```
-![Line_&_Erased](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/Line_&_Erased.jpeg)
+![Line&Erased](./images/Line&Erased.jpeg)
 
 
 
@@ -262,7 +265,7 @@ self.erased_line = cv2.addWeighted(self.Origin_image, 1, self.line_image, 1, 0)
 ### Trial
 `needed_x[]`, `needed_y[]`라는 리스트를 만들고,
 ContoursRect들의 `x, x+width, y, y+height`를 append하여 필요한 셀의 개수를 구해보자.
-![needed_line](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/needed_line.png)
+![needed_line](./images/needed_line.png)
 **Problem!**
 경계선 또한 한 개의 Cell로 취급하며, 너무 많은 셀의 정보가 나온다
 
@@ -275,7 +278,7 @@ ContoursRect들의 `x, x+width, y, y+height`를 append하여 필요한 셀의 �
 `temp_int`를 이용해 minimum_w(최소 cell의 width)보다 작은 비슷한 값의 x, y들을 평균값으로 압축, 불필요한 셀의 낭비를 막는다.
 이렇게 되면 결국 `len(final_x) - 1, len(final_y) - 1`이 필요한 x,y축 셀의 개수가 된다.
 
-![temp](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/temp.png)
+![needed_line_essential](./images/needed_line_essential.png)
 
 ---
 
@@ -283,7 +286,7 @@ ContoursRect들의 `x, x+width, y, y+height`를 append하여 필요한 셀의 �
 
 앞에서 구한 `final_x(x_axis)`, `final_y(y_axis)`의 정보를 이용.
 Cell을 생성하고 정보를 저장하는 것은 어렵지 않다.
-![스크린샷 2018-07-10 오후 3.49.01](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/스크린샷 2018-07-10 오후 3.49.01.png)
+![saved_cell](./images/saved_cell.png)
 
 
 ## Attempt! Find Cells' Boundary
@@ -302,7 +305,7 @@ Merge를 하려면
 line_image(라인만 있는 이미지)는 검은 바탕에 하얀색으로 칠하였기 때문에
 pixel을 받아와서 centeral 좌표를 기준으로 
 상하좌우 b != 0인 값이 있다면 경계선(boundary)이 있는 것으로 판별!
-![Cell값](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/Cell값.png)
+![saved_cell_with_boundary](./images/saved_cell_with_boundary.png)
 
 ---
 
@@ -311,37 +314,36 @@ OCR을 하기 전 Cell객체에 text를 담기 위해 line별로 세분화 되�
 먼저, 문자나 Form양식의 특성상 가로쓰기가 주를 이루며 가로로 셀이 merge되어 있는 경우가 많으므로,
 가로를 기준으로 Cell의 Right경계가 있거나, 다음 Cell의 Left경계가 있다면 이는 경계가 있는 것으로 판별하여 merge작업을 수행하며,
 그 결과 값을 바탕으로 세로 merge를 수행한다.
-![Cell_merged](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/Cell_merged.png)
+![cell_merged](./images/cell_merged.png)
 
 ## Result!
 ### < Form 1 >
-![무제.001](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/계산서/무제.001.jpeg)
+![result_1](./images/result_1.jpeg)
 
 ---
 
 ### < Form 2 >
-![영수증.001](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/영수증/영수증.001.jpeg)
+![result2-1](./images/result2-1.jpeg)
 
-
-
-![영수증.001 복사본](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/영수증/영수증.001 복사본.jpeg)
+![result2-2](./images/result2-2.jpeg)
 
 ### < Extra >
-![입사지원서.001](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/입사지원서/입사지원서.001.jpeg)
+![result_3](./images/result_3.jpeg)
 
 # 2) OCR cells
 
 Preprocessing으로 적절히 나눠진 Cell영역 내의 Text를 OCR을 통해 유니코드로 변환하여야 합니다.
-![FO-계산서-01](/Users/kimjungho/PycharmProjects/OCR_form/data/FO-계산서-01.png)
+![FO-계산서-01](./data/FO-계산서-01.png)
 
 ---
 
-![OCR결과](/Users/kimjungho/Desktop/Hoya/2018_하계인턴_비바엔에스/발표용/OCR결과.png)
+![result_OCR](./images/result_OCR.png)
 
 *작성중...*
 
-
 # 3) export to document
+
+![result](./images/result.png)
 
 *작성중...*
 
