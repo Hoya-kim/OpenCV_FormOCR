@@ -1,0 +1,60 @@
+# configuration for image pre-processing using OpenCV
+
+default_threshold:
+  low_threshold: 230
+  high_threshold: 255
+  thr_type: 0
+
+boxing:
+  # get threshold with Original image
+  low_threshold: 180
+  high_threshold: 255
+  thr_type: 0
+
+detect:
+  # get threshold with boxed image
+  low_threshold: 210
+  high_threshold: 255
+  thr_type: 0
+
+contour:
+  min_width: 15  # Minimum Contour Rectangle Size
+  min_height: 15  # Minimum Contour Rectangle Size
+  retrieve_mode: 2  # RETR_EXTERNAL = 0. RETR_LIST = 1, RETR_CCOMP = 2, RETR_TREE = 3, RETR_FLOODFILL = 4
+  approx_method: 2  # CHAIN_APPROX_NONE = 1, CHAIN_APPROX_SIMPLE = 2, CHAIN_APPROX_TC89_KCOS = 4, CHAIN_APPROX_TC89_L1 = 3
+
+canny:
+  low_threshold: 100
+  high_threshold: 200
+
+houghline:
+  rho: 1  # distance resolution in pixels of the Hough grid
+  threshold: 80  # minimum number of votes (intersections in Hough grid cell)
+
+closing:
+  kernel_size_row: 3  # Closing Kernel Size
+  kernel_size_col: 3  # Closing Kernel Size
+  iteration: 3  # Closing iterations
+  # 이미지의 크기가 크다면 iteration 횟수를 늘리는 것을 추천
+
+num_of_needed_cell:
+  find_min_width: 1000  # It is for compression that similar value of width
+  find_min_height: 1000 # It is for compression that similar value of height
+
+improve_ocr:
+  # OCR 인식률을 높이기 위한 여백 및 확대비율
+  additional_width: 50
+  additional_height: 50
+  zoom_fx: 1.5
+  zoom_fy: 2
+
+xlsx_standard:
+  paper_size_idx: 9 # index 9 : A4 210 x 297 mmm
+  default_format:
+    font_name: 'Calibri'
+    font_size: 10
+    font_color: '#000000'
+    align: 'center'
+    valign: 'vcenter'
+    border: 0
+    border_color: 'black'
